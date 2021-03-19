@@ -3,26 +3,36 @@ package com.xmethodius.colorblind.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.DrawableWrapper
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.Shape
 import android.renderscript.Int3
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.DrawableUtils
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.toColorInt
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.xmethodius.colorblind.model.Cell
 import com.xmethodius.colorblind.R
 
-class ColorsListAdapter(colorsList: List<Cell>, context: Context): RecyclerView.Adapter<ColorsListAdapter.ColorViewHolder>() {
+class ColorsListAdapter(private  var colorsList: List<Cell>, private val context: Context): RecyclerView.Adapter<ColorsListAdapter.ColorViewHolder>() {
 
-    private val list = colorsList
-    private val cont = context
+    inner class ColorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        val cellText: TextView = itemView.findViewById(R.id.colorText)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder {
-        return ColorViewHolder(LayoutInflater.from(cont).inflate(
+        return ColorViewHolder(LayoutInflater.from(context).inflate(
                 R.layout.color_cell,
                 parent,
                 false
@@ -32,59 +42,59 @@ class ColorsListAdapter(colorsList: List<Cell>, context: Context): RecyclerView.
 
     @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {
-        val cardView = holder.itemView
-        val colorText = holder.text
-        val layoutHeight = cardView.layoutParams.height
-        val currentColorName = list[position].color.colorName
-        val color = list[position].color.colorValue
-       // createCellShape(cardView, R.color.black)
-        colorText.text = currentColorName
+        val cell = holder.itemView
+        val cellText = holder.cellText
+        val layoutHeight = cell.layoutParams.height
 
-        if(list[position].selected) {
-            colorText.setTextColor(R.color.black)
-        } else {
-            colorText.setTextColor(color)
-        }
-
-        selectCell(cardView, colorText, layoutHeight, color, position)
+        changeCellColor(cell, position)
+        selectCell(cell, layoutHeight, position)
+        changeCellText(cellText, position)
+        changeTextColor(cellText, position)
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
+    override fun getItemCount(): Int = colorsList.size
 
-class ColorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val text: TextView = itemView.findViewById(R.id.colorText)
-    }
-
-    private fun createCellShape(cell: View, color: Int) {
-        val shape: GradientDrawable = GradientDrawable()
-        shape.cornerRadius = 80F
+    @SuppressLint("ResourceAsColor")
+    private fun updateCellShape(cell: View, color: Int) {
+        val cornerRadiusValue = 80F
+        val shape = GradientDrawable()
+        shape.cornerRadius = cornerRadiusValue
         shape.setColor(color)
         cell.background = shape
     }
 
+    private fun changeCellColor(cell: View, position: Int) {
+        val colorValue: Int = colorsList[position].color.colorValue
+         if(!colorsList[position].selected)
+            updateCellShape(cell, R.color.gray)
+        else
+            updateCellShape(cell, colorValue)
+    }
+
     @SuppressLint("ResourceAsColor")
-    private fun selectCell(cell: View, colorText: TextView, layoutHeight: Int, color: Int, position: Int) {
-        // cast color value to color int
-        // check for click on cardview
-        colorText.setOnClickListener {
-            // check if cell was not selected
-            if(!list[position].selected) {
-                list[position].selected = true
-                //change height of cardview
+    private fun changeTextColor(cellText: TextView, position: Int) {
+        val currentColorValue = colorsList[position].color.colorValue
+
+        if(colorsList[position].selected)
+            cellText.setTextColor(R.color.black)
+        else
+            cellText.setTextColor(currentColorValue)
+    }
+
+    private fun changeCellText(cellText: TextView, position: Int) {
+        val currentColorName = colorsList[position].color.colorName
+        cellText.text = currentColorName
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private fun selectCell(cell: View, layoutHeight: Int, position: Int) {
+        cell.setOnClickListener {
+            if(!colorsList[position].selected) {
+                colorsList[position].selected = true
                 cell.layoutParams.height = layoutHeight * 3
-                colorText.setTextColor(R.color.white)
-                createCellShape(cell, color)
-                cell.requestLayout()
             } else {
-                list[position].selected = false
+                colorsList[position].selected = false
                 cell.layoutParams.height = layoutHeight / 3
-                createCellShape(cell, R.color.gray)
-                if (color != null) {
-                    colorText.setTextColor(R.color.white)
-                }
-                cell.requestLayout()
             }
             notifyDataSetChanged()
         }

@@ -1,13 +1,11 @@
-package com.xmethodius.colorblind
+package com.xmethodius.colorblind.ui
 
-import android.content.res.AssetManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.xmethodius.colorblind.R
 import com.xmethodius.colorblind.adapter.ColorsListAdapter
 import com.xmethodius.colorblind.model.Cell
 import com.xmethodius.colorblind.model.Color
@@ -40,15 +38,22 @@ class MainActivity : AppCompatActivity() {
 
     @Throws(XmlPullParserException::class, IOException::class)
     private fun prepareParser(): InputStream {
-        return assets.open("colors.xml")
+        val fileName = "colors.xml"
+        return assets.open(fileName)
     }
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun fetchColorValues(s: String, parser: XmlPullParser) {
-        Log.d("log", "START TAG, NAME IS " + parser.name + " TEXT IS " + parser.lineNumber+
-        " ATTRIBUTE COUNT IS " + parser.attributeCount)
 
-        if(parser.name.equals("color"))
-            fillColorList(Color(parser.getAttributeValue(0).toString(), parser.getAttributeValue(1).toColorInt()))
+    @Throws(XmlPullParserException::class, IOException::class)
+    private fun fetchColorValues(parser: XmlPullParser) {
+        val attribute = "color"
+        val colorNameIndex = 0
+        val colorValueIndex = 1
+
+        if(parser.name.equals(attribute)) {
+            val colorName: String = parser.getAttributeValue(colorNameIndex)
+            val colorValue: Int = parser.getAttributeValue(colorValueIndex).toColorInt()
+            val color: Color = Color(colorName, colorValue)
+            addNewColor(color)
+        }
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
@@ -58,22 +63,13 @@ class MainActivity : AppCompatActivity() {
         parser.setInput(InputStreamReader(inputStream))
 
         while(parser.eventType != XmlPullParser.END_DOCUMENT) {
-            var s: String = ""
-            when(parser.eventType) {
-                XmlPullParser.START_DOCUMENT ->
-                    Log.d("log", "START DOCUMENT")
-                XmlPullParser.START_TAG ->
-                    fetchColorValues(s, parser)
-                XmlPullParser.END_TAG ->
-                    Log.d("log", "END TAG, NAME IS " + parser.name+ " TEXT IS " + parser.text)
-                XmlPullParser.TEXT -> {
-                    Log.d("log", "TEXT IS " + parser.text)}
-            }
+            if(parser.eventType == XmlPullParser.START_TAG)
+                fetchColorValues(parser)
             parser.next()
         }
     }
 
-    private fun fillColorList(color: Color) {
+    private fun addNewColor(color: Color) {
          colorList.add(color)
     }
 
