@@ -2,17 +2,24 @@ package com.xmethodius.colorblind.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.xmethodius.colorblind.model.Cell
 import com.xmethodius.colorblind.R
+import java.util.prefs.Preferences
 
 class ColorsListAdapter(private  var colorsList: List<Cell>, private val context: Context): RecyclerView.Adapter<ColorsListAdapter.ColorViewHolder>() {
-
+    
     inner class ColorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val cellText: TextView = itemView.findViewById(R.id.colorText)
@@ -31,18 +38,30 @@ class ColorsListAdapter(private  var colorsList: List<Cell>, private val context
     override fun onBindViewHolder(holder: ColorViewHolder, position: Int) {
         val cell = holder.itemView
         val cellText = holder.cellText
-        val layoutHeight = cell.layoutParams.height
 
-        changeCellColor(cell, position)
-        selectCell(cell, layoutHeight, position)
-        changeCellText(cellText, position)
-        changeTextColor(cellText, position)
+        setCellColor(cell, position)
+        selectCell(cell, position)
+        setCellText(cellText, position)
+        setTextColor(cellText, position)
+
     }
 
     override fun getItemCount(): Int = colorsList.size
 
     @SuppressLint("ResourceAsColor")
-    private fun updateCellShape(cell: View, color: Int) {
+    private fun updateCellItem(cell: View, position: Int) {
+        if (!colorsList[position].selected) {
+            colorsList[position].selected = true
+            cell.layoutParams.height *= 3
+        } else {
+            colorsList[position].selected = false
+            cell.layoutParams.height /= 3
+        }
+        notifyItemChanged(position, 0)
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private fun setCellShape(cell: View, color: Int) {
         val cornerRadiusValue = 80F
         val shape = GradientDrawable()
         shape.cornerRadius = cornerRadiusValue
@@ -50,40 +69,33 @@ class ColorsListAdapter(private  var colorsList: List<Cell>, private val context
         cell.background = shape
     }
 
-    private fun changeCellColor(cell: View, position: Int) {
+    private fun setCellColor(cell: View, position: Int) {
         val colorValue: Int = colorsList[position].color.colorValue
          if(!colorsList[position].selected)
-            updateCellShape(cell, R.color.gray)
+            setCellShape(cell, R.color.gray)
         else
-            updateCellShape(cell, colorValue)
+            setCellShape(cell, colorValue)
     }
 
     @SuppressLint("ResourceAsColor")
-    private fun changeTextColor(cellText: TextView, position: Int) {
+    private fun setTextColor(cellText: TextView, position: Int) {
         val currentColorValue = colorsList[position].color.colorValue
 
         if(colorsList[position].selected)
-            cellText.setTextColor(R.color.black)
+            cellText.setTextColor(R.color.gray)
         else
             cellText.setTextColor(currentColorValue)
     }
 
-    private fun changeCellText(cellText: TextView, position: Int) {
+    private fun setCellText(cellText: TextView, position: Int) {
         val currentColorName = colorsList[position].color.colorName
         cellText.text = currentColorName
     }
 
     @SuppressLint("ResourceAsColor")
-    private fun selectCell(cell: View, layoutHeight: Int, position: Int) {
+    private fun selectCell(cell: View, position: Int) {
         cell.setOnClickListener {
-            if(!colorsList[position].selected) {
-                colorsList[position].selected = true
-                cell.layoutParams.height = layoutHeight * 3
-            } else {
-                colorsList[position].selected = false
-                cell.layoutParams.height = layoutHeight / 3
-            }
-            notifyDataSetChanged()
+            updateCellItem(cell, position)
         }
     }
 }

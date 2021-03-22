@@ -1,7 +1,8 @@
-package com.xmethodius.colorblind.ui
+package com.xmethodius.colorblind.screen
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -51,8 +52,8 @@ class MainActivity : AppCompatActivity() {
         if(parser.name.equals(attribute)) {
             val colorName: String = parser.getAttributeValue(colorNameIndex)
             val colorValue: Int = parser.getAttributeValue(colorValueIndex).toColorInt()
-            val color: Color = Color(colorName, colorValue)
-            addNewColor(color)
+            val color = Color(colorName, colorValue)
+            addNewColorItem(color)
         }
     }
 
@@ -69,13 +70,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addNewColor(color: Color) {
+    private fun addNewColorItem(color: Color) {
          colorList.add(color)
     }
 
     private fun fillCellList() {
+        var ins = 0
         for(i in colorList) {
             cellList.add(Cell(i, false))
+            ins += 1
         }
     }
 
@@ -88,5 +91,4 @@ class MainActivity : AppCompatActivity() {
         list.layoutManager = LinearLayoutManager(this)
         list.adapter = adapter
     }
-
 }
