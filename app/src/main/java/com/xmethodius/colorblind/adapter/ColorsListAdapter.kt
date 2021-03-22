@@ -39,10 +39,10 @@ class ColorsListAdapter(private  var colorsList: List<Cell>, private val context
         val cell = holder.itemView
         val cellText = holder.cellText
 
-        setCellColor(cell, position)
+        updateCellColor(cell, position)
         selectCell(cell, position)
         setCellText(cellText, position)
-        setTextColor(cellText, position)
+        updateTextColor(cellText, position)
 
     }
 
@@ -61,7 +61,7 @@ class ColorsListAdapter(private  var colorsList: List<Cell>, private val context
     }
 
     @SuppressLint("ResourceAsColor")
-    private fun setCellShape(cell: View, color: Int) {
+    private fun updateCellShape(cell: View, color: Int) {
         val cornerRadiusValue = 80F
         val shape = GradientDrawable()
         shape.cornerRadius = cornerRadiusValue
@@ -69,19 +69,19 @@ class ColorsListAdapter(private  var colorsList: List<Cell>, private val context
         cell.background = shape
     }
 
-    private fun setCellColor(cell: View, position: Int) {
+    private fun updateCellColor(cell: View, position: Int) {
         val colorValue: Int = colorsList[position].color.colorValue
-         if(!colorsList[position].selected)
-            setCellShape(cell, R.color.gray)
+         if (!colorsList[position].selected)
+             updateCellShape(cell, R.color.gray)
         else
-            setCellShape(cell, colorValue)
+             updateCellShape(cell, colorValue)
     }
 
     @SuppressLint("ResourceAsColor")
-    private fun setTextColor(cellText: TextView, position: Int) {
+    private fun updateTextColor(cellText: TextView, position: Int) {
         val currentColorValue = colorsList[position].color.colorValue
 
-        if(colorsList[position].selected)
+        if (colorsList[position].selected)
             cellText.setTextColor(R.color.gray)
         else
             cellText.setTextColor(currentColorValue)

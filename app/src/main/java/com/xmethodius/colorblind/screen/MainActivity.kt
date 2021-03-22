@@ -28,8 +28,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        cellList = ArrayList<Cell>()
-        colorList = ArrayList<Color>()
+        cellList = ArrayList()
+        colorList = ArrayList()
 
         parseFile()
         fillCellList()
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         val colorNameIndex = 0
         val colorValueIndex = 1
 
-        if(parser.name.equals(attribute)) {
+        if (parser.name.equals(attribute)) {
             val colorName: String = parser.getAttributeValue(colorNameIndex)
             val colorValue: Int = parser.getAttributeValue(colorValueIndex).toColorInt()
             val color = Color(colorName, colorValue)
@@ -63,8 +63,8 @@ class MainActivity : AppCompatActivity() {
         val parser: XmlPullParser   = XmlPullParserFactory.newInstance().newPullParser()
         parser.setInput(InputStreamReader(inputStream))
 
-        while(parser.eventType != XmlPullParser.END_DOCUMENT) {
-            if(parser.eventType == XmlPullParser.START_TAG)
+        while (parser.eventType != XmlPullParser.END_DOCUMENT) {
+            if (parser.eventType == XmlPullParser.START_TAG)
                 fetchColorValues(parser)
             parser.next()
         }
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun fillCellList() {
         var ins = 0
-        for(i in colorList) {
+        for (i in colorList) {
             cellList.add(Cell(i, false))
             ins += 1
         }
