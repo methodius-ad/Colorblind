@@ -1,8 +1,7 @@
 package com.xmethodius.colorblind.screen
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +15,6 @@ import org.xmlpull.v1.XmlPullParserFactory
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import kotlin.jvm.Throws
 
 class MainActivity : AppCompatActivity() {
 
